@@ -1,4 +1,4 @@
-# IMPLICITS ANNOTATION PROCESSOR PLAYGROUND
+# Implicits Annotation Processor playground
 This is just a playground to discover the limitations we have with Kotlin and annotation processors.
 
 ### Composition for the time being
