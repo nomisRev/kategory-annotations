@@ -37,6 +37,7 @@ class ImplicitsProcessor : AbstractProcessor() {
         val rootElements = roundEnv.rootElements
         val implicitElements = roundEnv.getElementsAnnotatedWith(Implicit::class.java)
 
+
         messager.log("TEST NOTES!!! ********************************************************")
         messager.logW("TEST WARNINGS!!! ********************************************************")
         messager.log("Implicit classes found: " + implicitElements.size)
