@@ -8,7 +8,7 @@ The project is composed by different modules like most of the annotation process
 **compiler** module.
 * **compile-time:** This is the one containing the processor and any related computations. This dependency could be
 fetched just for compile time.
-* **app:** Just a sample app module to test annotations on top of classes or whatever.
+* **app:** Just a sample app module to test annotations on top of classes, fields, methods or whatever.
 
 ### How to run
 
