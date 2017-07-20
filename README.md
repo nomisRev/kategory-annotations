@@ -9,3 +9,8 @@ The project is composed by different modules like most of the annotation process
 * **compile-time:** This is the one containing the processor and any related computations. This dependency could be
 fetched just for compile time.
 * **app:** Just a sample app module to test annotations on top of classes or whatever.
+
+### How to run
+
+Just `/gradlew clean :app:build` and you should see some fancy texts with different priorities being printed with the
+compile time messager.
