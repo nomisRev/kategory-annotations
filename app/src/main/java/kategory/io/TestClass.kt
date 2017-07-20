@@ -1,6 +1,3 @@
 package kategory.io
 
-@Implicit
-class TestClass {
-
-}
+fun x(@implicit a: String) = a

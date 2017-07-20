@@ -16,9 +16,9 @@ public class AnnotationScanTests {
     public void addJobTest() {
         JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n')
                 .join("package test;",
-                        "import kategory.io.Implicit;",
-                        "@Implicit",
+                        "import kategory.io.implicit;",
                         "public class Test {",
+                        "public static String testImplicits(@implicit String a) { return a; }",
                         "}"));
 
         //Truth assertion

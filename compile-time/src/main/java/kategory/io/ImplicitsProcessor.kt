@@ -31,11 +31,11 @@ class ImplicitsProcessor : AbstractProcessor() {
         return SourceVersion.latestSupported()
     }
 
-    override fun getSupportedAnnotationTypes() = setOf(Implicit::class.java.canonicalName)
+    override fun getSupportedAnnotationTypes() = setOf(implicit::class.java.canonicalName)
 
     override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment): Boolean {
         val rootElements = roundEnv.rootElements
-        val implicitElements = roundEnv.getElementsAnnotatedWith(Implicit::class.java)
+        val implicitElements = roundEnv.getElementsAnnotatedWith(implicit::class.java)
 
 
         messager.log("TEST NOTES!!! ********************************************************")
