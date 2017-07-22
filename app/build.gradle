@@ -13,18 +13,16 @@ buildscript {
 }
 
 apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
 
 repositories {
     mavenCentral()
 }
 
-kapt {
-    generateStubs = true
-}
-
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     kapt project(':compile-time')
+    compile project(':compile-time')
     compile project(':annotations')
 }
 
@@ -36,6 +34,7 @@ compileTestKotlin {
 }
 
 apply plugin: 'idea'
+
 idea {
     module {
         sourceDirs += files(
