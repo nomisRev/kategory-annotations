@@ -2,6 +2,7 @@ package kategory.io
 
 import kategory.io.generation.FileGenerator
 import kategory.io.messager.log
+import kategory.io.messager.logMW
 import java.io.File
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.RoundEnvironment
@@ -17,10 +18,10 @@ class ImplicitsProcessor : AbstractProcessor() {
     override fun getSupportedAnnotationTypes() = setOf(implicit::class.java.canonicalName)
 
     override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment): Boolean {
-        processingEnv.messager.log("Implicits processor running...")
+        processingEnv.messager.logMW("Implicits processor running...")
         roundEnv.getElementsAnnotatedWith(implicit::class.java)
                 .forEach {
-                    processingEnv.messager.log("Implicit annotated class found: " + it.simpleName)
+                    processingEnv.messager.logMW("Implicit annotated class found: " + it.simpleName)
 
                     val kaptGeneratedDir = File(processingEnv.options["kapt.kotlin.generated"])
                     if (!kaptGeneratedDir.parentFile.exists()) {

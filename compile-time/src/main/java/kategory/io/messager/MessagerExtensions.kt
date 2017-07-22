@@ -12,6 +12,10 @@ fun Messager.logW(message: String) {
     this.printMessage(WARNING, message)
 }
 
+fun Messager.logMW(message: String) {
+    this.printMessage(MANDATORY_WARNING, message)
+}
+
 fun Messager.logE(message: String, vararg args: Any) {
     var formattedMsg = message
     if (args.isNotEmpty()) {
