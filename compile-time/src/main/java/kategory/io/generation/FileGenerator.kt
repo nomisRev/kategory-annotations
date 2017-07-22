@@ -8,8 +8,8 @@ import com.squareup.kotlinpoet.*
 class FileGenerator {
 
     fun createKotlinFile(): KotlinFile {
-        return KotlinFile.builder("kategory.io", "MyGeneratedClass")
-                .addType(TypeSpec.classBuilder("MyGeneratedClass")
+        return KotlinFile.builder("kategory.io", "TargetClass")
+                .addType(TypeSpec.classBuilder("TargetClass")
                         .primaryConstructor(FunSpec.constructorBuilder()
                                 .addParameter("name", String::class)
                                 .build())
