@@ -1,6 +1,11 @@
 # Implicits Annotation Processor playground
 This is just a playground to discover the limitations we have with Kotlin and annotation processors.
 
+### Current status
+
+We are analyzing @implicit annotations in code and generating kotlin files at compile time. Tests would still need to
+be tweaked to mock the sources dir path we are using know, otherwise they crash with a NPE.
+
 ### Composition for the time being
 
 The project is composed by different modules like most of the annotation processors out there.
