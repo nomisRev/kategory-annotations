@@ -1,14 +1,15 @@
 package kategory.io.generation
 
 import com.squareup.kotlinpoet.*
+import javax.lang.model.element.Name
 
 /**
  * Generate some Kotlin sample files using KotlinPoet.
  */
 class FileGenerator {
 
-    fun createKotlinFile(): KotlinFile {
-        return KotlinFile.builder("kategory.io", "TargetClass")
+    fun createKotlinFile(elementPackage: Name): KotlinFile {
+        return KotlinFile.builder(elementPackage.toString(), "TargetClass")
                 .addType(TypeSpec.classBuilder("TargetClass")
                         .primaryConstructor(FunSpec.constructorBuilder()
                                 .addParameter("name", String::class)
