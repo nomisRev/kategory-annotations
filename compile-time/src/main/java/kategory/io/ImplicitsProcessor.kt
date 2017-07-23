@@ -18,7 +18,6 @@ class ImplicitsProcessor : AbstractProcessor() {
     override fun getSupportedAnnotationTypes() = setOf(implicit::class.java.canonicalName)
 
     override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment): Boolean {
-        processingEnv.messager.logMW("Implicits processor running...")
         val fileGenerator = FileGenerator()
         roundEnv.getElementsAnnotatedWith(implicit::class.java)
                 .forEach {

@@ -26,14 +26,6 @@ dependencies {
     compile project(':annotations')
 }
 
-sourceSets {
-    main {
-        kotlin {
-            exclude '**/TargetClass.kt'
-        }
-    }
-}
-
 apply plugin: 'idea'
 
 idea {
