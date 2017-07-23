@@ -3,7 +3,7 @@ This is just a playground to discover the limitations we have with Kotlin and an
 
 ### Current status
 
-* We are analyzing `@implicit` annotations in code and generating kotlin files at compile time.
+* We are analyzing `@implicit` annotations in code and generating kotlin files at compile time using [KotlinPoet](https://github.com/square/kotlinpoet).
 * We are generating a double version of the annotated class and excluding the original one from compilation using
 Gradle, so the user can only reference the generated one when using it.
 
