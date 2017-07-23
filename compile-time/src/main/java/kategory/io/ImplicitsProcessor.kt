@@ -8,6 +8,7 @@ import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
 
+
 class ImplicitsProcessor : AbstractProcessor() {
 
     override fun getSupportedSourceVersion(): SourceVersion {
@@ -21,12 +22,15 @@ class ImplicitsProcessor : AbstractProcessor() {
         val fileGenerator = FileGenerator()
         roundEnv.getElementsAnnotatedWith(implicit::class.java)
                 .forEach {
-                    processingEnv.messager.logMW("Implicit annotated class found: " + it.simpleName)
+                    processingEnv.messager.logMW("Implicit annotated element found: " + it.simpleName)
 
                     val kaptGeneratedDir = File(processingEnv.options["kapt.kotlin.generated"])
                     if (!kaptGeneratedDir.parentFile.exists()) {
                         kaptGeneratedDir.parentFile.mkdirs()
                     }
+
+                    val rootProjectDir = File(".").canonicalPath
+                    processingEnv.messager.logMW("root project:" + rootProjectDir)
 
                     val elementPackage = processingEnv.elementUtils.getPackageOf(it).qualifiedName
                     val kotlinFile = fileGenerator.createKotlinFile(elementPackage)
