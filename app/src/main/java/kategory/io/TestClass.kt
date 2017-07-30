@@ -11,5 +11,7 @@ class Whatever {
 
         target.y(1.0, 0) // normal
         target.y(1.0)    // provided
+
+        target.z(f = 1.0)    // provided
     }
 }
