@@ -2,5 +2,16 @@ package kategory.io
 
 class Whatever {
 
-    val generatedClassInstance = TargetClass("any name").generatedFunction()
+    fun test() {
+
+        val target = TargetClass()
+
+        target.x("") // normal
+        target.x()   // provided
+
+        target.y(1.0, 0) // normal
+        target.y(1.0)    // provided
+
+        target.z(f = 1.0)    // provided
+    }
 }

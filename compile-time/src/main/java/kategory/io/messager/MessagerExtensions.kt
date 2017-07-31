@@ -1,33 +1,34 @@
 package kategory.io.messager
 
-import javax.annotation.processing.Messager
+import me.eugeniomarletti.kotlin.processing.KotlinProcessingUtils
+import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.AnnotationValue
 import javax.lang.model.element.Element
-import javax.tools.Diagnostic.Kind.*
+import javax.tools.Diagnostic.Kind.ERROR
+import javax.tools.Diagnostic.Kind.MANDATORY_WARNING
+import javax.tools.Diagnostic.Kind.NOTE
+import javax.tools.Diagnostic.Kind.WARNING
 
-fun Messager.log(message: String) {
-    this.printMessage(NOTE, message)
-}
+fun KotlinProcessingUtils.log(message: CharSequence,
+    element: Element? = null,
+    annotationMirror: AnnotationMirror? = null,
+    annotationValue: AnnotationValue? = null
+) = messager.printMessage(NOTE, message, element, annotationMirror, annotationValue)
 
-fun Messager.logW(message: String) {
-    this.printMessage(WARNING, message)
-}
+fun KotlinProcessingUtils.logW(message: CharSequence,
+    element: Element? = null,
+    annotationMirror: AnnotationMirror? = null,
+    annotationValue: AnnotationValue? = null
+) = messager.printMessage(WARNING, message, element, annotationMirror, annotationValue)
 
-fun Messager.logMW(message: String) {
-    this.printMessage(MANDATORY_WARNING, message)
-}
+fun KotlinProcessingUtils.logMW(message: CharSequence,
+    element: Element? = null,
+    annotationMirror: AnnotationMirror? = null,
+    annotationValue: AnnotationValue? = null
+) = messager.printMessage(MANDATORY_WARNING, message, element, annotationMirror, annotationValue)
 
-fun Messager.logE(message: String, vararg args: Any) {
-    var formattedMsg = message
-    if (args.isNotEmpty()) {
-        formattedMsg = String.format(message, *args)
-    }
-    this.printMessage(ERROR, formattedMsg)
-}
-
-fun Messager.logE(element: Element, message: String, vararg args: Any) {
-    var formattedMsg = message
-    if (args.isNotEmpty()) {
-        formattedMsg = String.format(message, *args)
-    }
-    this.printMessage(ERROR, formattedMsg, element)
-}
+fun KotlinProcessingUtils.logE(message: CharSequence,
+    element: Element? = null,
+    annotationMirror: AnnotationMirror? = null,
+    annotationValue: AnnotationValue? = null
+) = messager.printMessage(ERROR, message, element, annotationMirror, annotationValue)
