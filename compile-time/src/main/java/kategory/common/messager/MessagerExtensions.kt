@@ -1,4 +1,4 @@
-package kategory.io.messager
+package kategory.common.messager
 
 import me.eugeniomarletti.kotlin.processing.KotlinProcessingUtils
 import javax.lang.model.element.AnnotationMirror

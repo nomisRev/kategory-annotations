@@ -1,14 +1,14 @@
-package kategory.io
+package kategory.implicits
 
-import kategory.io.utils.ClassOrPackageDataWrapper
+import kategory.common.utils.ClassOrPackageDataWrapper
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import javax.lang.model.element.TypeElement
 
-sealed class Annotated {
+sealed class AnnotatedImplicits {
     abstract val classElement: TypeElement
     abstract val classOrPackageProto: ClassOrPackageDataWrapper
 
-    sealed class Consumer : Annotated() {
+    sealed class Consumer : AnnotatedImplicits() {
         data class ValueParameter(
             override val classElement: TypeElement,
             override val classOrPackageProto: ClassOrPackageDataWrapper,
@@ -17,7 +17,7 @@ sealed class Annotated {
         ) : Consumer()
     }
 
-    sealed class Provider : Annotated() {
+    sealed class Provider : AnnotatedImplicits() {
         data class Function(
             override val classElement: TypeElement,
             override val classOrPackageProto: ClassOrPackageDataWrapper,

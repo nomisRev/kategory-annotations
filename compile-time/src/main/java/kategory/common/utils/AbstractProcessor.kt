@@ -1,6 +1,6 @@
-package kategory.io.utils
+package kategory.common.utils
 
-import kategory.io.messager.logE
+import kategory.common.messager.logE
 import me.eugeniomarletti.kotlin.processing.KotlinAbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Element
@@ -12,7 +12,7 @@ class KnownException(message: String, val element: Element?) : RuntimeException(
     operator fun component2() = element
 }
 
-abstract class AbsImplicitsProcessor : KotlinAbstractProcessor(), ImplicitsProcessorUtils {
+abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils {
 
     override final fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
         if (!roundEnv.errorRaised()) {

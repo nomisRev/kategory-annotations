@@ -1,4 +1,4 @@
-package kategory.io.utils
+package kategory.common.utils
 
 import org.jetbrains.kotlin.serialization.ClassData
 import org.jetbrains.kotlin.serialization.PackageData
@@ -14,6 +14,7 @@ sealed class ClassOrPackageDataWrapper {
     abstract val constructorList: List<Constructor>
     abstract val functionList: List<Function>
     abstract val propertyList: List<Property>
+    abstract val typeParameters: List<TypeParameter>
     abstract fun getTypeParameter(typeParameterIndex: Int): TypeParameter?
 
     class Package(
@@ -24,6 +25,7 @@ sealed class ClassOrPackageDataWrapper {
         override val constructorList: List<Constructor> get() = emptyList()
         override val functionList: List<Function> get() = packageProto.functionList
         override val propertyList: List<Property> get() = packageProto.propertyList
+        override val typeParameters: List<TypeParameter> = emptyList()
         override fun getTypeParameter(typeParameterIndex: Int): TypeParameter? = null
     }
 
@@ -35,6 +37,7 @@ sealed class ClassOrPackageDataWrapper {
         override val constructorList: List<Constructor> get() = classProto.constructorList
         override val functionList: List<Function> get() = classProto.functionList
         override val propertyList: List<Property> get() = classProto.propertyList
+        override val typeParameters: List<TypeParameter> = classProto.typeParameterList
         override fun getTypeParameter(typeParameterIndex: Int): TypeParameter? = classProto.getTypeParameter(typeParameterIndex)
     }
 }

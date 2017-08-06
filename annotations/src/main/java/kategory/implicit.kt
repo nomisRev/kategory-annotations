@@ -1,4 +1,4 @@
-package kategory.io
+package kategory
 
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.annotation.AnnotationTarget.FUNCTION
