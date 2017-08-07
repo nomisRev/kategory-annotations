@@ -1,6 +1,6 @@
 package kategory
 
-interface HK<F, A>
+interface HK<out F, out A>
 
 typealias HK2<F, A, B> = HK<HK<F, A>, B>
 
