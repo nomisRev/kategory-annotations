@@ -66,7 +66,7 @@ class ImplicitsProcessor : AbstractProcessor() {
             }
 
         if (roundEnv.processingOver()) {
-            val generatedDir = File(options[kaptGeneratedOption], implicitAnnotationClass.simpleName).also { it.mkdirs() }
+            val generatedDir = File(this.generatedDir!!, implicitAnnotationClass.simpleName).also { it.mkdirs() }
             ImplicitsFileGenerator(generatedDir, annotatedList, useTypeAlias).generate()
         }
     }
