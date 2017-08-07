@@ -51,7 +51,7 @@ class HigherKindsFileGenerator(
     }
 
     private fun genEv(hk: HigherKind): String =
-            "fun <A> ${hk.name}<${hk.expandedTypeArgs}>.ev(): ${hk.kindName}<${hk.expandedTypeArgs}> = this as ${hk.kindName}<${hk.expandedTypeArgs}>"
+            "fun <${hk.expandedTypeArgs}> ${hk.name}<${hk.expandedTypeArgs}>.ev(): ${hk.kindName}<${hk.expandedTypeArgs}> = this as ${hk.kindName}<${hk.expandedTypeArgs}>"
 
     private fun genKindMarker(hk: HigherKind): String =
             "class ${hk.markerName} private constructor()"
