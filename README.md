@@ -1,30 +1,38 @@
-# Implicits Annotation Processor playground
-This is just a playground to discover the limitations we have with Kotlin and annotation processors.
+# Kategory annotations and processors
+
+Kategory annotations for easier typed FP
 
 ### Current status
 
-* We are analyzing `@implicit` annotations in code and generating kotlin files at compile time using [KotlinPoet](https://github.com/square/kotlinpoet).
-* We are generating a double version of the annotated class. We are getting a compileKotlin error about the duality:
+* @higherkind
 
-```
-:app:compileKotlin
-Using kotlin incremental compilation
-implicits/app/build/generated/source/kaptKotlin/main/kategory/io/TargetClass.kt: (5, 7): Redeclaration: TargetClass
-implicits/app/src/main/java/kategory/io/TargetClass.kt: (7, 7): Redeclaration: TargetClass
+When annotating a class as a @higherkind Kategory will generate all the HK machinery needed to emulate HigherKinds in Kotlin.
+
+```kotlin
+@higherkind sealed class Option<A> : OptionKind<A>
 ```
 
-Tests would still need to be tweaked to mock the sources dir path we are using know, otherwise they crash with a NPE.
+`OptionKind` is a Higher Kind representation of the `Option` type constructor that can be used as target in typeclasses such as 
+Functor, Applicative, Monad etc.
 
-### Composition for the time being
+We currently support up to 5 type args in derivation. 
+In the case above the following is generated:
 
-The project is composed by different modules like most of the annotation processors out there.
-* **annotations:** This one would contain the annotations. Client projects like the **app** one depend on it. Also the
-**compiler** module.
-* **compile-time:** This is the one containing the processor and any related computations. This dependency could be
-fetched just for compile time.
-* **app:** Just a sample app module to test annotations on top of classes, fields, methods or whatever.
+```kotlin
+class OptionHK private constructor()
+typealias OptionKind<A> = kategory.HK<OptionHK, A>
+fun <A> OptionKind<A>.ev(): Option<A> = this as Option<A>
+```
 
-### How to run
+### In progress
 
-Just `/gradlew clean :app:build` and you should see some fancy texts with different priorities being printed with the
-compile time messager.
+@implicit allows implicit value lookup in a global scope currently only for monomorfic non recursive declarations:
+
+```kotlin
+@implicit fun provideString() = "1"
+
+fun x(@implicit a: String): String = a
+```
+
+Here `x` receives `provideString()` as default Value for `a` by generating an extension function.
+Users may call `x()` implicitly requiring the implicit inyected or explicitly `x("yourvalue")`
