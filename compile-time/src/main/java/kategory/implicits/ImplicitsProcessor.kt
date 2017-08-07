@@ -100,8 +100,8 @@ class ImplicitsProcessor : AbstractProcessor() {
         if (property != null) return AnnotatedImplicits.Provider.Property(classElement, proto, property)
 
         val function = proto.getFunction(methodElement)
-        //if (function.valueParameterList.any { !it.declaresDefaultValue })
-        //    knownError("$implicitAnnotationName functions must have no parameters or those parameters must have default values")
+        if (function.valueParameterList.any { !it.declaresDefaultValue })
+            knownError("$implicitAnnotationName functions must have no parameters or those parameters must have default values")
 
         return AnnotatedImplicits.Provider.Function(classElement, proto, function)
     }
