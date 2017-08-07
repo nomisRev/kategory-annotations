@@ -5,4 +5,5 @@ import kotlin.annotation.AnnotationTarget.CLASS
 
 @Retention(RUNTIME)
 @Target(CLASS)
+@MustBeDocumented
 annotation class higherkind
