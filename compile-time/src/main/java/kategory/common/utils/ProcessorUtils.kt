@@ -70,7 +70,7 @@ fun ClassOrPackageDataWrapper.getPropertyOrNull(methodElement: ExecutableElement
 fun ProtoBuf.Type.extractFullName(
     classData: ClassOrPackageDataWrapper,
     outputTypeAlias: Boolean = true,
-    failOnGeneric: Boolean = false
+    failOnGeneric: Boolean = true
 ): String {
     val nameResolver = classData.nameResolver
 
