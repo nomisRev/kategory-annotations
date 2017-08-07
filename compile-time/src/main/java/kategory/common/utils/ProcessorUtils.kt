@@ -1,6 +1,6 @@
-package kategory.io.utils
+package kategory.common.utils
 
-import kategory.io.implicitAnnotationName
+import kategory.implicits.implicitAnnotationName
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.KotlinMetadata
 import me.eugeniomarletti.kotlin.metadata.KotlinMetadataUtils
@@ -14,7 +14,7 @@ import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 
-interface ImplicitsProcessorUtils : KotlinMetadataUtils {
+interface ProcessorUtils : KotlinMetadataUtils {
 
     fun KotlinMetadata.asClassOrPackageDataWrapper(classElement: TypeElement): ClassOrPackageDataWrapper? {
         val `package` = elementUtils.getPackageOf(classElement).toString()

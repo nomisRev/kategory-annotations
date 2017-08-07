@@ -1,4 +1,6 @@
-package kategory.io
+package kategory.implicits
+
+import kategory.implicit
 
 val implicitAnnotationKClass = implicit::class
 val implicitAnnotationClass = implicitAnnotationKClass.java

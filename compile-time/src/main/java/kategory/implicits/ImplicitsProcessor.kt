@@ -1,13 +1,12 @@
-package kategory.io
+package kategory.implicits
 
 import com.google.auto.service.AutoService
-import kategory.io.generation.FileGenerator
-import kategory.io.utils.AbsImplicitsProcessor
-import kategory.io.utils.ClassOrPackageDataWrapper
-import kategory.io.utils.getParameter
-import kategory.io.utils.getPropertyOrNull
-import kategory.io.utils.isCompanionOrObject
-import kategory.io.utils.knownError
+import kategory.common.utils.AbstractProcessor
+import kategory.common.utils.ClassOrPackageDataWrapper
+import kategory.common.utils.getParameter
+import kategory.common.utils.getPropertyOrNull
+import kategory.common.utils.isCompanionOrObject
+import kategory.common.utils.knownError
 import me.eugeniomarletti.kotlin.metadata.classKind
 import me.eugeniomarletti.kotlin.metadata.declaresDefaultValue
 import me.eugeniomarletti.kotlin.metadata.kaptGeneratedOption
@@ -36,7 +35,7 @@ import javax.lang.model.element.VariableElement
 //TODO open issue about nested functions not having stubs, resulting in annotations not going through processing
 
 @AutoService(Processor::class)
-class ImplicitsProcessor : AbsImplicitsProcessor() {
+class ImplicitsProcessor : AbstractProcessor() {
 
     companion object {
         const val useTypeAliasOption = "kategory.io.useTypeAlias"
@@ -44,7 +43,7 @@ class ImplicitsProcessor : AbsImplicitsProcessor() {
 
     private val useTypeAlias by lazy { options[useTypeAliasOption] == "true" }
 
-    private val annotatedList = mutableListOf<Annotated>()
+    private val annotatedList = mutableListOf<AnnotatedImplicits>()
 
     override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
@@ -52,6 +51,9 @@ class ImplicitsProcessor : AbsImplicitsProcessor() {
 
     override fun getSupportedOptions(): Set<String> = setOf(useTypeAliasOption)
 
+    /**
+     * Processor entry point
+     */
     override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
         annotatedList += roundEnv
             .getElementsAnnotatedWith(implicitAnnotationClass)
@@ -64,12 +66,15 @@ class ImplicitsProcessor : AbsImplicitsProcessor() {
             }
 
         if (roundEnv.processingOver()) {
-            val generatedDir = File(options[kaptGeneratedOption], implicitAnnotationClass.simpleName).also { it.mkdirs() }
-            FileGenerator(generatedDir, annotatedList, useTypeAlias).generate()
+            val generatedDir = File(this.generatedDir!!, implicitAnnotationClass.simpleName).also { it.mkdirs() }
+            ImplicitsFileGenerator(generatedDir, annotatedList, useTypeAlias).generate()
         }
     }
 
-    private fun processParameter(parameterElement: VariableElement): Annotated {
+    /**
+     * All annotated parameters are considered consumer of global implicit declarations
+     */
+    private fun processParameter(parameterElement: VariableElement): AnnotatedImplicits {
         val methodElement = parameterElement.enclosingElement as ExecutableElement
         if (methodElement.kind == CONSTRUCTOR) knownError("$implicitAnnotationName constructor parameters are not yet supported")
 
@@ -79,22 +84,25 @@ class ImplicitsProcessor : AbsImplicitsProcessor() {
         val parameter = proto.getParameter(function, parameterElement)
         if (parameter.declaresDefaultValue) knownError("Parameters annotated with $implicitAnnotationName can't have default values")
 
-        return Annotated.Consumer.ValueParameter(classElement, proto, function, parameter)
+        return AnnotatedImplicits.Consumer.ValueParameter(classElement, proto, function, parameter)
     }
 
-    private fun processMethod(methodElement: ExecutableElement): Annotated {
+    /**
+     * All annotated methods provide implicit provider candidates that can fulfil consumer requests
+     */
+    private fun processMethod(methodElement: ExecutableElement): AnnotatedImplicits {
         val classElement = methodElement.enclosingElement as TypeElement
         val proto = getClassOrPackageDataWrapper(classElement)
         if (proto is ClassOrPackageDataWrapper.Class && !proto.classProto.classKind.isCompanionOrObject)
             knownError("Only properties/functions that are top level or inside a companion/object can be $implicitAnnotationName providers")
 
         val property = proto.getPropertyOrNull(methodElement)
-        if (property != null) return Annotated.Provider.Property(classElement, proto, property)
+        if (property != null) return AnnotatedImplicits.Provider.Property(classElement, proto, property)
 
         val function = proto.getFunction(methodElement)
         if (function.valueParameterList.any { !it.declaresDefaultValue })
             knownError("$implicitAnnotationName functions must have no parameters or those parameters must have default values")
 
-        return Annotated.Provider.Function(classElement, proto, function)
+        return AnnotatedImplicits.Provider.Function(classElement, proto, function)
     }
 }

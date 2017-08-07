@@ -1,4 +1,4 @@
-package kategory.io
+package kategory.implicits
 
 class Whatever {
 
@@ -13,5 +13,11 @@ class Whatever {
         target.y(1.0)    // provided
 
         target.z(f = 1.0)    // provided
+
+        target.l(listOf(999)) // normal
+        target.l() // provided
+
+       // val lint: List<Int> = target.la<Int>()
+
     }
 }
