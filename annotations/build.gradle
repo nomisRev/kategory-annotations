@@ -1,8 +1,7 @@
-group 'kategory.io'
-version '1.0-SNAPSHOT'
-
 apply plugin: 'kotlin'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
