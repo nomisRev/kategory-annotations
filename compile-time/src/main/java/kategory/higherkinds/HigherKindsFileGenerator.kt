@@ -16,7 +16,7 @@ data class HigherKind(
     val kindName: Name = target.classElement.simpleName
     val alias: String = if (tparams.size == 1) "kategory.HK" else "kategory.HK${tparams.size}"
     val expandedTypeArgs: String = target.classOrPackageProto.typeParameters.joinToString(
-            separator = ",", transform = { target.classOrPackageProto.nameResolver.getString(it.name) })
+            separator = ", ", transform = { target.classOrPackageProto.nameResolver.getString(it.name) })
     val name: String = "${kindName}Kind"
     val markerName = "${kindName}HK"
 }
@@ -51,7 +51,7 @@ class HigherKindsFileGenerator(
     }
 
     private fun genEv(hk: HigherKind): String =
-            "fun <${hk.expandedTypeArgs}> ${hk.name}<${hk.expandedTypeArgs}>.ev(): ${hk.kindName}<${hk.expandedTypeArgs}> = this as ${hk.kindName}<${hk.expandedTypeArgs}>"
+            "@Suppress("UNCHECKED_CAST") fun <${hk.expandedTypeArgs}> ${hk.name}<${hk.expandedTypeArgs}>.ev(): ${hk.kindName}<${hk.expandedTypeArgs}> = this as ${hk.kindName}<${hk.expandedTypeArgs}>"
 
     private fun genKindMarker(hk: HigherKind): String =
             "class ${hk.markerName} private constructor()"
