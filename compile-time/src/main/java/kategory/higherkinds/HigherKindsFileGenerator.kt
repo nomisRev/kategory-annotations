@@ -51,7 +51,7 @@ class HigherKindsFileGenerator(
     }
 
     private fun genEv(hk: HigherKind): String =
-            "@Suppress(\"UNCHECKED_CAST\") fun <${hk.expandedTypeArgs}> ${hk.name}<${hk.expandedTypeArgs}>.ev(): ${hk.kindName}<${hk.expandedTypeArgs}> = this as ${hk.kindName}<${hk.expandedTypeArgs}>"
+            "@Suppress(\"UNCHECKED_CAST\") inline fun <${hk.expandedTypeArgs}> ${hk.name}<${hk.expandedTypeArgs}>.ev(): ${hk.kindName}<${hk.expandedTypeArgs}> = this as ${hk.kindName}<${hk.expandedTypeArgs}>"
 
     private fun genKindMarker(hk: HigherKind): String =
             "class ${hk.markerName} private constructor()"
