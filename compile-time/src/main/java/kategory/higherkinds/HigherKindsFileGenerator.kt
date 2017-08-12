@@ -57,7 +57,7 @@ class HigherKindsFileGenerator(
         val appliedTypeArgs = hk.typeArgs.dropLast(1)
         val expandedAppliedTypeArgs = appliedTypeArgs.joinToString(", ")
         val hkimpl = if (appliedTypeArgs.size == 1) "kategory.HK" else "kategory.HK${appliedTypeArgs.size}"
-        return "typealias ${hk.name}PartiallyApplied<$expandedAppliedTypeArgs> = $hkimpl<${hk.markerName}, $expandedAppliedTypeArgs>"
+        return "typealias ${hk.name}Partial<$expandedAppliedTypeArgs> = $hkimpl<${hk.markerName}, $expandedAppliedTypeArgs>"
     }
 
     private fun genEv(hk: HigherKind): String =

@@ -8,7 +8,7 @@ import kategory.higherkind
 
 @higherkind sealed class StateT<F, S, A> : StateTKind<F, S, A>
 
-typealias X<L> = EitherKindPartiallyApplied<L>
+typealias X<L> = EitherKindPartial<L>
 
-typealias Z<F, S> = StateTKindPartiallyApplied<F, S>
+typealias Z<F, S> = StateTKindPartial<F, S>
 
