@@ -15,6 +15,7 @@ data class HigherKind(
     val tparams: List<ProtoBuf.TypeParameter> = target.classOrPackageProto.typeParameters
     val kindName: Name = target.classElement.simpleName
     val alias: String = if (tparams.size == 1) "kategory.HK" else "kategory.HK${tparams.size}"
+    val typeArgs: List<String> = target.classOrPackageProto.typeParameters.map { target.classOrPackageProto.nameResolver.getString(it.name) }
     val expandedTypeArgs: String = target.classOrPackageProto.typeParameters.joinToString(
             separator = ",", transform = { target.classOrPackageProto.nameResolver.getString(it.name) })
     val name: String = "${kindName}Kind"
@@ -33,21 +34,30 @@ class HigherKindsFileGenerator(
      */
     fun generate() {
         higherKinds.forEachIndexed { counter, hk ->
-            val elementsToGenerate = listOf(genKindMarker(hk), genKindTypeAlias(hk), genEv(hk))
+            val elementsToGenerate = listOf(genKindMarker(hk), genKindTypeAliases(hk), genEv(hk))
             val source: String = elementsToGenerate.joinToString(prefix = "package ${hk.`package`}\n\n", separator = "\n")
             val file = File(generatedDir, higherKindsAnnotationClass.simpleName + "Extensions$counter.kt")
             file.writeText(source)
         }
     }
 
-    private fun genKindTypeAlias(hk: HigherKind): String {
+    private fun genKindTypeAliases(hk: HigherKind): String {
         return if (hk.tparams.isEmpty()) {
             knownError("Class must have at least one type param to derive HigherKinds")
         } else if (hk.tparams.size <= 5) {
-            "typealias ${hk.name}<${hk.expandedTypeArgs}> = ${hk.alias}<${hk.markerName}, ${hk.expandedTypeArgs}>"
+            val kindAlias = "typealias ${hk.name}<${hk.expandedTypeArgs}> = ${hk.alias}<${hk.markerName}, ${hk.expandedTypeArgs}>"
+            val acc = if (hk.tparams.size == 1) kindAlias else kindAlias + "\n" + genPartiallyAppliedKinds(hk)
+            acc
         } else {
             knownError("HigherKinds are currently only supported up to a max of 5 type args")
         }
+    }
+
+    private fun genPartiallyAppliedKinds(hk: HigherKind): String {
+        val appliedTypeArgs = hk.typeArgs.dropLast(1)
+        val expandedAppliedTypeArgs = appliedTypeArgs.joinToString(", ")
+        val hkimpl = if (appliedTypeArgs.size == 1) "kategory.HK" else "kategory.HK${appliedTypeArgs.size}"
+        return "typealias ${hk.name}Partial<$expandedAppliedTypeArgs> = $hkimpl<${hk.markerName}, $expandedAppliedTypeArgs>"
     }
 
     private fun genEv(hk: HigherKind): String =
