@@ -26,8 +26,8 @@ interface ProcessorUtils : KotlinMetadataUtils {
     }
 
     fun getClassOrPackageDataWrapper(classElement: TypeElement): ClassOrPackageDataWrapper {
-        val metadata = classElement.kotlinMetadata ?: knownError("$implicitAnnotationName can only be used in Kotlin")
-        return metadata.asClassOrPackageDataWrapper(classElement) ?: knownError("$implicitAnnotationName can't be used on this element")
+        val metadata = classElement.kotlinMetadata ?: knownError("These annotations can only be used in Kotlin")
+        return metadata.asClassOrPackageDataWrapper(classElement) ?: knownError("This annotation can't be used on this element")
     }
 
     fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement) =

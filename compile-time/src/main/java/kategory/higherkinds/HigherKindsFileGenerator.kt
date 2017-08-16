@@ -6,8 +6,6 @@ import kategory.common.utils.knownError
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import javax.lang.model.element.Name
 
-typealias HigherKindsExtensionFunction = String
-
 data class HigherKind(
         val `package`: Package,
         val target: AnnotatedHigherKind
