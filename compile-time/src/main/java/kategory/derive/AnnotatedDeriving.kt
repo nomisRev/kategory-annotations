@@ -7,4 +7,4 @@ import javax.lang.model.element.TypeElement
 class AnnotatedDeriving(
         val classElement: TypeElement,
         val classOrPackageProto: ClassOrPackageDataWrapper,
-        val derivingTypeclasses: List<Any>)
+        val derivingTypeclasses: List<ClassOrPackageDataWrapper>)
