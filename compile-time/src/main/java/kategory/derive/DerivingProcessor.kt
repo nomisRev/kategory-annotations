@@ -67,7 +67,7 @@ class DerivingProcessor : AbstractProcessor() {
     }
 
     private fun processClass(element: TypeElement): AnnotatedDeriving {
-        val proto: ClassOrPackageDataWrapper = getClassOrPackageDataWrapper(element)
+        val proto: ClassOrPackageDataWrapper.Class = getClassOrPackageDataWrapper(element) as ClassOrPackageDataWrapper.Class
         val typeClasses: List<ClassOrPackageDataWrapper> = element.annotationMirrors.flatMap { am ->
             am.elementValues.entries.filter {
                 "typeclasses" == it.key.simpleName.toString()
@@ -86,7 +86,10 @@ class DerivingProcessor : AbstractProcessor() {
             val superTypes = recurseInterfaces(typeClassWrapper, typeTable, emptyList())
             typeClassWrapper to superTypes
         }.toMap()
-        return AnnotatedDeriving(element, proto, typeClasses, typeclassSuperTypes)
+        val companionName = proto.nameResolver.getString(proto.classProto.fqName).replace("/", ".") + "." + proto.nameResolver.getString(proto.classProto.companionObjectName)
+        val typeClassElement = elementUtils.getTypeElement(companionName)
+        val companionProto = getClassOrPackageDataWrapper(typeClassElement)
+        return AnnotatedDeriving(element, proto, companionProto, typeClasses, typeclassSuperTypes)
     }
 
 }

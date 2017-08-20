@@ -12,7 +12,12 @@ fun argAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: String, r
         abstractType.replace("`kategory`.`HK`<`$typeClassFirstTypeArg`,\\s".toRegex(), "`$receiverType$KindPostFix`<")
 
 fun retTypeAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: String, receiverType: String): String =
-        abstractType.replace("`kategory`.`HK`<`$typeClassFirstTypeArg`,\\s".toRegex(), "`$receiverType`<")
+        if (abstractType.startsWith("`kategory`.`HK`")) {
+            abstractType.replace("`kategory`.`HK`<`$typeClassFirstTypeArg`,\\s".toRegex(), "`$receiverType`<")
+        } else {
+            abstractType.replace("`kategory`.`HK`<`$typeClassFirstTypeArg`,\\s".toRegex(), "`$receiverType$KindPostFix`<")
+        }
+
 
 fun String.removeBackSticks() = this.replace("`", "")
 
@@ -82,7 +87,7 @@ class TypeclassInstanceGenerator(
         val targetType: AnnotatedDeriving,
         val typeClass: ClassOrPackageDataWrapper.Class) {
 
-    val target = targetType.classOrPackageProto
+    val target: ClassOrPackageDataWrapper.Class = targetType.classOrPackageProto as ClassOrPackageDataWrapper.Class
 
     val receiverType: String = targetType.classElement.qualifiedName.toString()
 
@@ -112,14 +117,17 @@ class TypeclassInstanceGenerator(
 
     val instanceName: String = "$receiverName${typeClassName}Instance"
 
-    fun targetRequestDelegation(f: FunctionSignature): Boolean {
-        return when (f.hkArgs) {
-            is HKArgs.None -> f.isAbstract
-            is HKArgs.First -> f.isAbstract || target.functionList.any {
-                val typeClassFunctionName = target.nameResolver.getString(it.name)
+    fun compatibleFunctionCheck(f: FunctionSignature, c: ClassOrPackageDataWrapper) : Boolean =
+            c.functionList.any {
+                val typeClassFunctionName = c.nameResolver.getString(it.name)
                 typeClassFunctionName == f.name
             }
-            is HKArgs.Unknown -> f.isAbstract
+
+    fun targetRequestDelegation(f: FunctionSignature): Boolean {
+        return when (f.hkArgs) {
+            is HKArgs.None -> f.isAbstract || compatibleFunctionCheck(f, targetType.companionClassProto)
+            is HKArgs.First -> f.isAbstract || compatibleFunctionCheck(f, target)
+            is HKArgs.Unknown -> f.isAbstract || compatibleFunctionCheck(f, targetType.companionClassProto)
         }
     }
 
@@ -160,4 +168,3 @@ class DerivingFileGenerator(
             }.joinToString("\n\n")
 
 }
-

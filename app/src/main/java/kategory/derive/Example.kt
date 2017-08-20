@@ -44,6 +44,8 @@ sealed class Option<out A> : OptionKind<A> {
 
     fun <B> flatMap(f: (A) -> OptionKind<B>): Option<B> = TODO()
 
+    fun <B> ap(ff: OptionKind<(A) -> B>): Option<B> = TODO()
+
     companion object {
         fun <A> pure(a: A): Option<A> = TODO()
         fun <A, B> lift(f: (A) -> B): (OptionKind<A>) -> Option<B> = TODO()
