@@ -18,7 +18,6 @@ fun retTypeAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: Strin
             abstractType.replace("`kategory`.`HK`<`$typeClassFirstTypeArg`,\\s".toRegex(), "`$receiverType$KindPostFix`<")
         }
 
-
 fun String.removeBackSticks() = this.replace("`", "")
 
 sealed class HKArgs {
@@ -77,7 +76,6 @@ data class FunctionSignature(
                     },
                     receiverType = receiverType,
                     isAbstract = isAbstract
-
             )
         }
     }
@@ -117,21 +115,21 @@ class TypeclassInstanceGenerator(
 
     val instanceName: String = "$receiverName${typeClassName}Instance"
 
-    fun compatibleFunctionCheck(f: FunctionSignature, c: ClassOrPackageDataWrapper) : Boolean =
+    fun targetHasFunction(f: FunctionSignature, c: ClassOrPackageDataWrapper): Boolean =
             c.functionList.any {
                 val typeClassFunctionName = c.nameResolver.getString(it.name)
                 typeClassFunctionName == f.name
             }
 
-    fun targetRequestDelegation(f: FunctionSignature): Boolean {
+    fun targetRequestsDelegation(f: FunctionSignature): Boolean {
         return when (f.hkArgs) {
-            is HKArgs.None -> f.isAbstract || compatibleFunctionCheck(f, targetType.companionClassProto)
-            is HKArgs.First -> f.isAbstract || compatibleFunctionCheck(f, target)
-            is HKArgs.Unknown -> f.isAbstract || compatibleFunctionCheck(f, targetType.companionClassProto)
+            is HKArgs.None -> f.isAbstract || targetHasFunction(f, targetType.companionClassProto)
+            is HKArgs.First -> f.isAbstract || targetHasFunction(f, target)
+            is HKArgs.Unknown -> f.isAbstract || targetHasFunction(f, targetType.companionClassProto)
         }
     }
 
-    val delegatedFunctions: List<String> = functionSignatures().filter(this::targetRequestDelegation).map { it.generate() }
+    val delegatedFunctions: List<String> = functionSignatures().filter(this::targetRequestsDelegation).map { it.generate() }
 
     fun generate(): String {
         return """

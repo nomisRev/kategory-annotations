@@ -11,9 +11,8 @@ import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
-import javax.lang.model.element.*
-import javax.lang.model.util.ElementFilter
-
+import javax.lang.model.element.ElementKind
+import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
 class DerivingProcessor : AbstractProcessor() {
