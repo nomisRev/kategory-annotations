@@ -51,9 +51,9 @@ class HigherKindsFileGenerator(
             knownError("Class must have at least one type param to derive HigherKinds")
         } else if (hk.tparams.size <= 5) {
             val kindAlias = "typealias ${hk.name}<${hk.expandedTypeArgs}> = ${hk.alias}<${hk.markerName}, ${hk.expandedTypeArgs}>"
-            val acc = if (hk.tparams.size == 1) kindAlias else kindAlias + "\n" + genPartiallyAppliedKinds(hk)
-            val kindjAcc = if (!hk.isInvariant) acc else acc + "\ntypealias ${hk.name}J<${hk.expandedTypeArgs}> = ${hk.aliasJ}<${hk.markerName}, ${hk.expandedTypeArgs}>"
-            kindjAcc
+            val kindJAlias = if (!hk.isInvariant) kindAlias else kindAlias + "\ntypealias ${hk.name}J<${hk.expandedTypeArgs}> = ${hk.aliasJ}<${hk.markerName}, ${hk.expandedTypeArgs}>"
+            val acc = if (hk.tparams.size == 1) kindJAlias else kindJAlias + "\n" + genPartiallyAppliedKinds(hk)
+            acc
         } else {
             knownError("HigherKinds are currently only supported up to a max of 5 type args")
         }
