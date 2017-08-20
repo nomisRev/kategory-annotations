@@ -1,6 +1,6 @@
 package kategory
 
-import io.kindedj.HK as HK_J
+import io.kindedj.HK as HK1_J
 
 interface HK<out F, out A>
 
@@ -12,10 +12,12 @@ typealias HK4<F, A, B, C, D> = HK<HK3<F, A, B, C>, D>
 
 typealias HK5<F, A, B, C, D, E> = HK<HK4<F, A, B, C, D>, E>
 
-typealias HK2_J<F, A, B> = HK_J<HK_J<F, A>, B>
+typealias HK_J<F, A> = HK1_J<F, A>
 
-typealias HK3_J<F, A, B, C> = HK_J<HK2<F, A, B>, C>
+typealias HK2_J<F, A, B> = HK1_J<HK_J<F, A>, B>
 
-typealias HK4_J<F, A, B, C, D> = HK_J<HK3<F, A, B, C>, D>
+typealias HK3_J<F, A, B, C> = HK1_J<HK2<F, A, B>, C>
 
-typealias HK5_J<F, A, B, C, D, E> = HK_J<HK4<F, A, B, C, D>, E>
+typealias HK4_J<F, A, B, C, D> = HK1_J<HK3<F, A, B, C>, D>
+
+typealias HK5_J<F, A, B, C, D, E> = HK1_J<HK4<F, A, B, C, D>, E>
