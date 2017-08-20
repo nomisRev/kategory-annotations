@@ -3,6 +3,7 @@ package kategory.higherkinds
 import kategory.common.Package
 import kategory.common.utils.knownError
 import org.jetbrains.kotlin.serialization.ProtoBuf
+import org.jetbrains.kotlin.serialization.ProtoBuf.TypeParameter.Variance
 import java.io.File
 import javax.lang.model.element.Name
 
@@ -13,7 +14,6 @@ data class HigherKind(
         val target: AnnotatedHigherKind
 ) {
     val tparams: List<ProtoBuf.TypeParameter> = target.classOrPackageProto.typeParameters
-    val isInvariant = target.classOrPackageProto.typeParameters.map { it.variance == ProtoBuf.TypeParameter.Variance.INV }.reduce { acc, value -> acc && value }
     val kindName: Name = target.classElement.simpleName
     val alias: String = if (tparams.size == 1) "kategory.HK" else "kategory.HK${tparams.size}"
     val aliasJ: String = if (tparams.size == 1) "kategory.HK_J" else "kategory.HK${tparams.size}_J"
@@ -22,6 +22,25 @@ data class HigherKind(
             separator = ", ", transform = { target.classOrPackageProto.nameResolver.getString(it.name) })
     val name: String = "${kindName}Kind"
     val markerName = "${kindName}HK"
+    val variance: Variance = target.classOrPackageProto.typeParameters.map { it.variance }.reduce { acc: Variance?, value: Variance? -> addVariance(acc, value) }
+
+    private fun addVariance(acc: Variance?, value: Variance?): Variance =
+            when (acc) {
+                null -> knownError("In class $kindName: Variance not found for some generic parameter")
+                Variance.INV -> acc
+                Variance.IN -> when (value) {
+                    null -> knownError("In class $kindName: Variance not found for some generic parameter")
+                    Variance.INV -> value
+                    Variance.IN -> Variance.IN
+                    Variance.OUT -> Variance.INV
+                }
+                Variance.OUT -> when (value) {
+                    null -> knownError("In class $kindName: Variance not found for some generic parameter")
+                    Variance.INV -> value
+                    Variance.IN -> Variance.INV
+                    Variance.OUT -> Variance.OUT
+                }
+            }
 }
 
 class HigherKindsFileGenerator(
@@ -51,7 +70,7 @@ class HigherKindsFileGenerator(
             knownError("Class must have at least one type param to derive HigherKinds")
         } else if (hk.tparams.size <= 5) {
             val kindAlias = "typealias ${hk.name}<${hk.expandedTypeArgs}> = ${hk.alias}<${hk.markerName}, ${hk.expandedTypeArgs}>"
-            val kindJAlias = if (!hk.isInvariant) kindAlias else kindAlias + "\ntypealias ${hk.name}J<${hk.expandedTypeArgs}> = ${hk.aliasJ}<${hk.markerName}, ${hk.expandedTypeArgs}>"
+            val kindJAlias = if (hk.variance != Variance.INV) kindAlias else kindAlias + "\ntypealias ${hk.name}J<${hk.expandedTypeArgs}> = ${hk.aliasJ}<${hk.markerName}, ${hk.expandedTypeArgs}>"
             val acc = if (hk.tparams.size == 1) kindJAlias else kindJAlias + "\n" + genPartiallyAppliedKinds(hk)
             acc
         } else {
