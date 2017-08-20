@@ -3,7 +3,10 @@ package kategory.derive
 import com.google.auto.service.AutoService
 import kategory.common.utils.AbstractProcessor
 import kategory.common.utils.ClassOrPackageDataWrapper
+import kategory.common.utils.extractFullName
 import kategory.common.utils.knownError
+import org.jetbrains.kotlin.serialization.deserialization.TypeTable
+import org.jetbrains.kotlin.serialization.deserialization.supertypes
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -40,18 +43,28 @@ class DerivingProcessor : AbstractProcessor() {
         }
     }
 
-    fun getExecutableElement(typeElement: TypeElement, name: Name): ExecutableElement? {
-        val te = processingEnv.typeUtils.asElement(typeElement.superclass) as TypeElement
-        return ElementFilter.methodsIn(te.enclosedElements).find {
-            name == it.simpleName && it.parameters.isEmpty()
+    fun recurseInterfaces(
+            current: ClassOrPackageDataWrapper.Class,
+            typeTable: TypeTable,
+            acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> {
+        val interfaces = current.classProto.supertypes(typeTable).map {
+            it.extractFullName(current, failOnGeneric = false)
+        }.filter {
+            it != "`kategory`.`Typeclass`"
+        }
+        return when {
+            interfaces.isEmpty() -> acc
+            else -> {
+                interfaces.flatMap { i ->
+                    val className = i.removeBackSticks().substringBefore("<")
+                    val typeClassElement = elementUtils.getTypeElement(className)
+                    val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
+                    val newAcc = acc + parentInterface
+                    recurseInterfaces(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, newAcc)
+                }
+            }
         }
     }
-
-    fun findEnclosingTypeElement(e: Element): TypeElement {
-        val e = if (e !is TypeElement) e.enclosingElement else e
-        return TypeElement::class.java.cast(e)
-    }
-
 
     private fun processClass(element: TypeElement): AnnotatedDeriving {
         val proto: ClassOrPackageDataWrapper = getClassOrPackageDataWrapper(element)
@@ -67,7 +80,13 @@ class DerivingProcessor : AbstractProcessor() {
                 }
             }
         }
-        return AnnotatedDeriving(element, proto, typeClasses)
+        val typeclassSuperTypes = typeClasses.map { tc ->
+            val typeClassWrapper = tc as ClassOrPackageDataWrapper.Class
+            val typeTable = TypeTable(typeClassWrapper.classProto.typeTable)
+            val superTypes = recurseInterfaces(typeClassWrapper, typeTable, emptyList())
+            typeClassWrapper to superTypes
+        }.toMap()
+        return AnnotatedDeriving(element, proto, typeClasses, typeclassSuperTypes)
     }
 
 }

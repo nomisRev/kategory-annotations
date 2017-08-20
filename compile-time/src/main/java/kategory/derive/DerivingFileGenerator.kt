@@ -2,8 +2,19 @@ package kategory.derive
 
 import kategory.common.utils.ClassOrPackageDataWrapper
 import kategory.common.utils.extractFullName
+import kategory.higherkinds.HKMarkerPostFix
+import kategory.higherkinds.KindPostFix
+import me.eugeniomarletti.kotlin.metadata.modality
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import java.io.File
+
+fun argAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: String, receiverType: String): String =
+        abstractType.replace("`kategory`.`HK`<`$typeClassFirstTypeArg`,\\s".toRegex(), "`$receiverType$KindPostFix`<")
+
+fun retTypeAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: String, receiverType: String): String =
+        abstractType.replace("`kategory`.`HK`<`$typeClassFirstTypeArg`,\\s".toRegex(), "`$receiverType`<")
+
+fun String.removeBackSticks() = this.replace("`", "")
 
 sealed class HKArgs {
     object None : HKArgs()
@@ -12,40 +23,117 @@ sealed class HKArgs {
 }
 
 data class FunctionSignature(
-        val typeParams: List<String>,
+        val tparams: List<String>,
         val name: String,
         val args: List<Pair<String, String>>,
         val retType: String,
         val hkArgs: HKArgs,
-        val receiverType: String
+        val receiverType: String,
+        val isAbstract: Boolean
 
 ) {
 
-    override fun toString(): String {
-        val typeParamsS = typeParams.joinToString(prefix = "<`", separator = "`, `", postfix = "`>")
+    fun generate(): String {
+        val typeParamsS = tparams.joinToString(prefix = "<`", separator = "`, `", postfix = "`>")
         val argsS = args.map { "${it.first}: ${it.second}" }.joinToString(prefix = "(`", separator = "`, `", postfix = "`)")
-        return "override fun $typeParamsS `$name`$argsS: $retType =\n\t${implBody()}"
+        return """|override fun $typeParamsS `$name`$argsS: $retType =
+                  |    ${implBody()}""".removeBackSticks().trimMargin()
     }
 
     fun implBody(): String =
-            when(hkArgs) {
+            when (hkArgs) {
                 is HKArgs.None -> "${receiverType}.${name}()"
                 is HKArgs.First -> "${args[0].first}.ev().${name}(${args.drop(1).map { it.first }.joinToString(", ")})"
                 is HKArgs.Unknown -> "${receiverType}.${name}(${args.map { it.first }.joinToString(", ")})"
             }
 
     companion object {
-        fun from(r: AnnotatedDeriving, c: ClassOrPackageDataWrapper, f: ProtoBuf.Function): FunctionSignature =
-                FunctionSignature(
-                        f.typeParameterList.map { c.nameResolver.getString(it.name) },
-                        c.nameResolver.getString(f.name),
-                        f.valueParameterList.map { c.nameResolver.getString(it.name) to it.type.extractFullName(c, failOnGeneric = false) },
-                        f.returnType.extractFullName(c, failOnGeneric = false),
-                        if (f.valueParameterList.isEmpty()) HKArgs.None
-                        else if (c.nameResolver.getString(f.getValueParameter(0).type.className).startsWith("kategory/HK")) HKArgs.First
-                        else HKArgs.Unknown,
-                        r.classElement.qualifiedName.toString()
-                )
+
+        fun from(receiverType: String, typeClass: ClassOrPackageDataWrapper, f: ProtoBuf.Function): FunctionSignature {
+            val typeParams = f.typeParameterList.map { typeClass.nameResolver.getString(it.name) }
+            val typeClassAbstractKind = typeClass.nameResolver.getString(typeClass.typeParameters[0].name)
+            val args = f.valueParameterList.map {
+                val argName = typeClass.nameResolver.getString(it.name)
+                val argType = it.type.extractFullName(typeClass, failOnGeneric = false)
+                argName to argAsSeenFromReceiver(typeClassAbstractKind, argType, receiverType)
+            }
+            val abstractReturnType = f.returnType.extractFullName(typeClass, failOnGeneric = false)
+            val concreteType = retTypeAsSeenFromReceiver(typeClassAbstractKind, abstractReturnType, receiverType)
+            val isAbstract = f.modality == ProtoBuf.Modality.ABSTRACT
+            return FunctionSignature(
+                    tparams = typeParams,
+                    name = typeClass.nameResolver.getString(f.name),
+                    args = args,
+                    retType = concreteType,
+                    hkArgs = when {
+                        f.valueParameterList.isEmpty() -> HKArgs.None
+                        typeClass.nameResolver.getString(f.getValueParameter(0).type.className).startsWith("kategory/HK") -> HKArgs.First
+                        else -> HKArgs.Unknown
+                    },
+                    receiverType = receiverType,
+                    isAbstract = isAbstract
+
+            )
+        }
+    }
+}
+
+class TypeclassInstanceGenerator(
+        val targetType: AnnotatedDeriving,
+        val typeClass: ClassOrPackageDataWrapper.Class) {
+
+    val target = targetType.classOrPackageProto
+
+    val receiverType: String = targetType.classElement.qualifiedName.toString()
+
+    val receiverName: String = "${receiverType.substringAfterLast(".")}$HKMarkerPostFix"
+
+    val typeClassFQName: String =
+            typeClass.nameResolver.getString(typeClass.classProto.fqName).replace("/", ".")
+
+    val typeClassName: String = typeClassFQName.substringAfterLast(".")
+
+    val typeClassAbstractKind: String = typeClass.nameResolver.getString(typeClass.typeParameters[0].name)
+
+    val tparams: List<String> = typeClass.typeParameters.map { typeClass.nameResolver.getString(it.name) }
+
+    val tparamsAsSeenFromReceiver: List<String> = listOf(receiverName) + tparams.drop(1)
+
+    fun functionSignatures(): List<FunctionSignature> {
+        val tcs = listOf(typeClass) + targetType.typeclassSuperTypes[typeClass]!!
+        return tcs.flatMap { tc ->
+            tc.functionList.map {
+                FunctionSignature.from(receiverType, tc, it)
+            }
+        }.distinctBy { it.name }
+    }
+
+    val companionFactoryName: String = typeClassName[0].toLowerCase() + typeClassName.drop(1)
+
+    val instanceName: String = "$receiverName${typeClassName}Instance"
+
+    fun targetRequestDelegation(f: FunctionSignature): Boolean {
+        return when (f.hkArgs) {
+            is HKArgs.None -> f.isAbstract
+            is HKArgs.First -> f.isAbstract || target.functionList.any {
+                val typeClassFunctionName = target.nameResolver.getString(it.name)
+                typeClassFunctionName == f.name
+            }
+            is HKArgs.Unknown -> f.isAbstract
+        }
+    }
+
+    val delegatedFunctions: List<String> = functionSignatures().filter(this::targetRequestDelegation).map { it.generate() }
+
+    fun generate(): String {
+        return """
+            |interface $instanceName : ${typeClassFQName}<${tparamsAsSeenFromReceiver.joinToString(", ")}> {
+            |  ${delegatedFunctions.joinToString("\n\n  ")}
+            |}
+            |
+            |fun ${receiverType}.Companion.${companionFactoryName}(): $instanceName =
+            |  object : $instanceName {}
+        """.removeBackSticks().trimMargin()
     }
 }
 
@@ -58,14 +146,18 @@ class DerivingFileGenerator(
      * Main entry point for deriving extension generation
      */
     fun generate() {
-        annotatedList.forEach { c ->
-            c.derivingTypeclasses.forEach { tc ->
-                tc.functionList.forEach { func ->
-                    val expectedFunction = FunctionSignature.from(c, tc, func)
-                    println(expectedFunction)
-                }
-            }
+        annotatedList.forEachIndexed { counter, c ->
+            val elementsToGenerate = listOf(genImpl(c))
+            val source: String = elementsToGenerate.joinToString(prefix = "package ${c.classOrPackageProto.`package`}\n\n", separator = "\n")
+            val file = File(generatedDir, derivingAnnotationClass.simpleName + "Extensions$counter.kt")
+            file.writeText(source)
         }
     }
 
+    private fun genImpl(c: AnnotatedDeriving): String =
+            c.derivingTypeclasses.filter { it is ClassOrPackageDataWrapper.Class }.map {
+                TypeclassInstanceGenerator(c, it as ClassOrPackageDataWrapper.Class).generate()
+            }.joinToString("\n\n")
+
 }
+
