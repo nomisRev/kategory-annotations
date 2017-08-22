@@ -40,9 +40,11 @@ open class GlobalInstance<T : Typeclass>(recurseInterfaces: Boolean = true) : Ty
         }
         if (found.isNotEmpty()) {
             val instanceType = InstanceParametrizedType(found[0], listOf(type.actualTypeArguments[0]))
-            val registered = GlobalInstances.putIfAbsent(instanceType, this)
-            if (registered != null) {
-                println("registered single typeclass: $instanceType")
+            if (!GlobalInstances.containsKey(instanceType)) {
+                val registered = GlobalInstances.putIfAbsent(instanceType, this)
+                if (registered != null) {
+                    println("registered single typeclass: $instanceType -> $this")
+                }
             }
         }
     }
