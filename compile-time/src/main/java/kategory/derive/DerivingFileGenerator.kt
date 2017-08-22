@@ -139,7 +139,7 @@ class TypeclassInstanceGenerator(
             |}
             |
             |fun ${receiverType}.Companion.${companionFactoryName}(): $instanceName =
-            |  object : $instanceName, kategory.GlobalInstance<${typeClassFQName}<$tArgs>>() {}
+            |  object : $instanceName, kategory.GlobalInstance<${typeClassFQName}<$tArgs>>(false) {}
         """.removeBackticks().trimMargin()
     }
 }
