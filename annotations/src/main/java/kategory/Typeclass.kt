@@ -75,26 +75,10 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
 /**
  * Auto registers subtypes as a global instance for all the functional typeclass interfaces they implement
  */
-open class GlobalInstance<T : Typeclass>(recurseInterfaces: Boolean = true) : TypeLiteral<T>() {
+open class GlobalInstance<T : Typeclass> : TypeLiteral<T>() {
 
     init {
-        if (recurseInterfaces) recurseInterfaces(javaClass)
-        else registerSingleTypeClass(javaClass)
-    }
-
-    fun registerSingleTypeClass(c: Class<*>) {
-        val found = c.interfaces.filter {
-            it != Typeclass::class.java && Typeclass::class.java.isAssignableFrom(it)
-        }
-        found.forEach {
-            val instanceType = InstanceParametrizedType(it, listOf(type.actualTypeArguments[0]))
-            if (!GlobalInstances.containsKey(instanceType)) {
-                val registered = GlobalInstances.putIfAbsent(instanceType, this)
-                if (registered == null) {
-                    println("registered single typeclass: $instanceType -> $this")
-                }
-            }
-        }
+        recurseInterfaces(javaClass)
     }
 
     /**
