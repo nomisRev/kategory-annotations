@@ -116,5 +116,9 @@ data class TypeClassInstanceNotFound(val type: Type)
 fun <T : Typeclass> instance(t: Type): T {
     if (GlobalInstances.containsKey(t))
         return GlobalInstances.getValue(t) as T
-    else throw TypeClassInstanceNotFound(t)
+    else {
+        val e = TypeClassInstanceNotFound(t)
+        println(e.message)
+        throw e
+    }
 }
