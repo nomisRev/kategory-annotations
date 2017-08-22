@@ -18,7 +18,7 @@ fun retTypeAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: Strin
             abstractType.replace("`kategory`.`HK`<`$typeClassFirstTypeArg`,\\s".toRegex(), "`$receiverType$KindPostFix`<")
         }
 
-fun String.removeBackSticks() = this.replace("`", "")
+fun String.removeBackticks() = this.replace("`", "")
 
 sealed class HKArgs {
     object None : HKArgs()
@@ -41,7 +41,7 @@ data class FunctionSignature(
         val typeParamsS = tparams.joinToString(prefix = "<`", separator = "`, `", postfix = "`>")
         val argsS = args.map { "${it.first}: ${it.second}" }.joinToString(prefix = "(`", separator = "`, `", postfix = "`)")
         return """|override fun $typeParamsS `$name`$argsS: $retType =
-                  |    ${implBody()}""".removeBackSticks().trimMargin()
+                  |    ${implBody()}""".removeBackticks().trimMargin()
     }
 
     fun implBody(): String =
@@ -139,7 +139,7 @@ class TypeclassInstanceGenerator(
             |
             |fun ${receiverType}.Companion.${companionFactoryName}(): $instanceName =
             |  object : $instanceName {}
-        """.removeBackSticks().trimMargin()
+        """.removeBackticks().trimMargin()
     }
 }
 

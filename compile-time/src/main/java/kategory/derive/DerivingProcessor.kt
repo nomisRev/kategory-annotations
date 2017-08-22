@@ -55,7 +55,7 @@ class DerivingProcessor : AbstractProcessor() {
             interfaces.isEmpty() -> acc
             else -> {
                 interfaces.flatMap { i ->
-                    val className = i.removeBackSticks().substringBefore("<")
+                    val className = i.removeBackticks().substringBefore("<")
                     val typeClassElement = elementUtils.getTypeElement(className)
                     val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
                     val newAcc = acc + parentInterface
