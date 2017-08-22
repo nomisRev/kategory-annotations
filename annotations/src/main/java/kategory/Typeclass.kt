@@ -38,8 +38,8 @@ open class GlobalInstance<T : Typeclass>(recurseInterfaces: Boolean = true) : Ty
         val found = c.interfaces.filter {
             it != Typeclass::class.java && Typeclass::class.java.isAssignableFrom(it)
         }
-        if (found.isNotEmpty()) {
-            val instanceType = InstanceParametrizedType(found[0], listOf(type.actualTypeArguments[0]))
+        found.forEach {
+            val instanceType = InstanceParametrizedType(it, listOf(type.actualTypeArguments[0]))
             if (!GlobalInstances.containsKey(instanceType)) {
                 val registered = GlobalInstances.putIfAbsent(instanceType, this)
                 if (registered != null) {
