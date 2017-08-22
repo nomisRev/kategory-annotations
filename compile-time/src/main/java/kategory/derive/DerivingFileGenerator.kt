@@ -132,13 +132,14 @@ class TypeclassInstanceGenerator(
     val delegatedFunctions: List<String> = functionSignatures().filter(this::targetRequestsDelegation).map { it.generate() }
 
     fun generate(): String {
+        val tArgs = tparamsAsSeenFromReceiver.joinToString(", ")
         return """
-            |interface $instanceName : ${typeClassFQName}<${tparamsAsSeenFromReceiver.joinToString(", ")}> {
+            |interface $instanceName : ${typeClassFQName}<$tArgs> {
             |  ${delegatedFunctions.joinToString("\n\n  ")}
             |}
             |
             |fun ${receiverType}.Companion.${companionFactoryName}(): $instanceName =
-            |  object : $instanceName {}
+            |  object : $instanceName, kategory.GlobalInstance<${typeClassFQName}<$tArgs>>() {}
         """.removeBackticks().trimMargin()
     }
 }
