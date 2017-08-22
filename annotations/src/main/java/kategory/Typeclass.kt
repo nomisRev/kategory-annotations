@@ -16,56 +16,12 @@ interface Typeclass
  * A parametrized type calculated from walking up the interface chain in a Typeclass and finding other relevant
  * typeclasses that should be registered
  */
-class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : ParameterizedType {
+data class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : ParameterizedType {
     override fun getRawType(): Type = raw
 
     override fun getOwnerType(): Type? = null
 
     override fun getActualTypeArguments(): Array<Type> = typeArgs.toTypedArray()
-
-    override fun equals(other: Any?): Boolean {
-        if (other is ParameterizedType) {
-            // Check that information is equivalent
-            val that = other
-
-            if (this === that)
-                return true
-
-            val thatOwner = that.ownerType
-            val thatRawType = that.rawType
-
-            if (false) { // Debugging
-                val ownerEquality = if (ownerType == null)
-                    thatOwner == null
-                else
-                    ownerType == thatOwner
-                val rawEquality = rawType == thatRawType
-
-                val typeArgEquality = Arrays.equals(actualTypeArguments, // avoid clone
-                        that.actualTypeArguments)
-                for (t in actualTypeArguments) {
-                    System.out.printf("\t\t%s%s%n", t, t.javaClass)
-                }
-
-                System.out.printf("\towner %s\traw %s\ttypeArg %s%n",
-                        ownerEquality, rawEquality, typeArgEquality)
-                return ownerEquality && rawEquality && typeArgEquality
-            }
-
-            return ownerType == thatOwner &&
-                    rawType == thatRawType &&
-                    Arrays.equals(actualTypeArguments, // avoid clone
-                            that.actualTypeArguments)
-        } else
-            return false
-    }
-
-    override fun hashCode(): Int = Arrays.hashCode(actualTypeArguments) xor
-            hashCode(ownerType) xor
-            hashCode(rawType)
-
-    fun hashCode(o: Any?): Int = o?.hashCode() ?: 0
-
 }
 
 /**
