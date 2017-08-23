@@ -17,7 +17,6 @@ subprojects { project ->
     version = VERSION_NAME
 
     repositories {
-        mavenLocal()
         jcenter()
         maven { url 'https://kotlin.bintray.com/kotlinx' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
