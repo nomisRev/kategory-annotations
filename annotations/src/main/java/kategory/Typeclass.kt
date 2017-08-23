@@ -38,24 +38,6 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
             val thatOwner = that.ownerType
             val thatRawType = that.rawType
 
-            if (false) { // Debugging
-                val ownerEquality = if (ownerType == null)
-                    thatOwner == null
-                else
-                    ownerType == thatOwner
-                val rawEquality = rawType == thatRawType
-
-                val typeArgEquality = Arrays.equals(actualTypeArguments, // avoid clone
-                        that.actualTypeArguments)
-                for (t in actualTypeArguments) {
-                    System.out.printf("\t\t%s%s%n", t, t.javaClass)
-                }
-
-                System.out.printf("\towner %s\traw %s\ttypeArg %s%n",
-                        ownerEquality, rawEquality, typeArgEquality)
-                return ownerEquality && rawEquality && typeArgEquality
-            }
-
             return ownerType == thatOwner &&
                     rawType == thatRawType &&
                     Arrays.equals(actualTypeArguments, // avoid clone
