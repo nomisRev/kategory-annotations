@@ -42,8 +42,9 @@ class InstanceParametrizedType(val raw: Type, val typeArgs: List<Type>) : Parame
                     rawType == thatRawType &&
                     Arrays.equals(actualTypeArguments, // avoid clone
                             that.actualTypeArguments)
-        } else
+        } else {
             return false
+        }
     }
 
     override fun hashCode(): Int = Arrays.hashCode(actualTypeArguments) xor
