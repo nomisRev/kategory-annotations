@@ -132,13 +132,14 @@ class TypeclassInstanceGenerator(
     val delegatedFunctions: List<String> = functionSignatures().filter(this::targetRequestsDelegation).map { it.generate() }
 
     fun generate(): String {
+        val tArgs = tparamsAsSeenFromReceiver.joinToString(", ")
         return """
-            |interface $instanceName : ${typeClassFQName}<${tparamsAsSeenFromReceiver.joinToString(", ")}> {
+            |interface $instanceName : ${typeClassFQName}<$tArgs> {
             |  ${delegatedFunctions.joinToString("\n\n  ")}
             |}
             |
             |fun ${receiverType}.Companion.${companionFactoryName}(): $instanceName =
-            |  object : $instanceName {}
+            |  object : $instanceName, ${typeClassFQName}<$tArgs>, kategory.GlobalInstance<${typeClassFQName}<$tArgs>>() {}
         """.removeBackticks().trimMargin()
     }
 }
@@ -155,7 +156,7 @@ class DerivingFileGenerator(
         annotatedList.forEachIndexed { counter, c ->
             val elementsToGenerate = listOf(genImpl(c))
             val source: String = elementsToGenerate.joinToString(prefix = "package ${c.classOrPackageProto.`package`}\n\n", separator = "\n")
-            val file = File(generatedDir, derivingAnnotationClass.simpleName + "Extensions$counter.kt")
+            val file = File(generatedDir, derivingAnnotationClass.simpleName + "Extensions${c.classElement.simpleName}$counter.kt")
             file.writeText(source)
         }
     }
