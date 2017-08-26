@@ -9,7 +9,7 @@ kapt {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
-    compile project(':annotations')
+    compile project(':kategory-annotations')
     //compile 'com.squareup:kotlinpoet:0.3.0'
     compile 'me.eugeniomarletti:kotlin-metadata:1.1.0'
     compileOnly 'com.google.auto.service:auto-service:1.0-rc3'

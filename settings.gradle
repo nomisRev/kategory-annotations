@@ -1,5 +1,5 @@
 rootProject.name = 'implicits'
-include 'compile-time'
+include 'kategory-annotations-compile'
 include 'app'
-include 'annotations'
+include 'kategory-annotations'
 

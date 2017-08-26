@@ -7,9 +7,9 @@ apply from: 'generated-kotlin-sources.gradle'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile project(':annotations')
-    kapt project(':compile-time')
-    compileOnly project(':compile-time') //TODO remove after KT-19178
+    compile project(':kategory-annotations')
+    kapt project(':kategory-annotations-compile')
+    compileOnly project(':kategory-annotations-compile') //TODO remove after KT-19178
 }
 
 compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"] //TODO remove after KT-16780
