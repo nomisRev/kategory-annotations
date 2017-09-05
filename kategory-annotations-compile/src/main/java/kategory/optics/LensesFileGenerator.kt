@@ -2,9 +2,7 @@ package kategory.optics
 
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KotlinFile
-import kategory.Lens
 import java.io.File
-
 
 class LensesFileGenerator(
         private val annotatedList: Collection<AnnotatedLens.Element>,
@@ -25,14 +23,14 @@ class LensesFileGenerator(
 
                 FunSpec.builder("$className${variableName.toString().capitalize()}")
                         .addStatement(
-                                """return %T(
+                                """return Lens(
                                    |        get = { $className: %T -> $className.$variableName },
                                    |        set = { $variableName: %T ->
                                    |            { $className: %T ->
                                    |                $className.copy($variableName = $variableName)
                                    |            }
                                    |        }
-                                   |)""".trimMargin(), Lens::class, annotatedLens.type, variable, annotatedLens.type)
+                                   |)""".trimMargin(), annotatedLens.type, variable, annotatedLens.type)
                         .build()
             }
 

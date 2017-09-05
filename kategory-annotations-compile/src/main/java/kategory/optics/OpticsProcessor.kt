@@ -27,7 +27,7 @@ class OptikalProcessor : AbstractProcessor() {
 
     override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
         annotatedLenses += roundEnv
-                .getElementsAnnotatedWith(higherKindsAnnotationClass)
+                .getElementsAnnotatedWith(lensesAnnotationClass)
                 .map(this::evalAnnotatedElement)
                 .map { annotatedLens ->
                     when (annotatedLens) {
