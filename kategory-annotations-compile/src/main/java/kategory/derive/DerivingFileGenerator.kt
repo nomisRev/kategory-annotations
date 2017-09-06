@@ -156,7 +156,7 @@ class DerivingFileGenerator(
         annotatedList.forEachIndexed { counter, c ->
             val elementsToGenerate = listOf(genImpl(c))
             val source: String = elementsToGenerate.joinToString(prefix = "package ${c.classOrPackageProto.`package`}\n\n", separator = "\n")
-            val file = File(generatedDir, derivingAnnotationClass.simpleName + "Extensions${c.classElement.simpleName}$counter.kt")
+            val file = File(generatedDir, derivingAnnotationClass.simpleName + ".${c.classElement.qualifiedName}.kt")
             file.writeText(source)
         }
     }

@@ -37,7 +37,7 @@ class HigherKindsFileGenerator(
         higherKinds.forEachIndexed { counter, hk ->
             val elementsToGenerate = listOf(genKindMarker(hk), genKindTypeAliases(hk), genEv(hk))
             val source: String = elementsToGenerate.joinToString(prefix = "package ${hk.`package`}\n\n", separator = "\n", postfix = "\n")
-            val file = File(generatedDir, higherKindsAnnotationClass.simpleName + "Extensions$counter.kt")
+            val file = File(generatedDir, higherKindsAnnotationClass.simpleName + ".${hk.target.classElement.qualifiedName}.kt")
             file.writeText(source)
         }
     }

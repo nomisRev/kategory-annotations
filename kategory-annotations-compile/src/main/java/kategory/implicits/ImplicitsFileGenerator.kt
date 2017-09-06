@@ -40,10 +40,19 @@ class ImplicitsFileGenerator(
         val consumerFunctionGroupsByPackage: Map<Package, List<List<Consumer>>> = getConsumerFunctionGroupsByPackage(consumers)
         val functionsToGenerateByPackage: Map<Package, List<FunctionToGenerate>> = getFunctionsToGenerateByPackage(consumerFunctionGroupsByPackage, providerInvocationsByType)
 
-        functionsToGenerateByPackage.entries.forEachIndexed { counter, (`package`, functionsToGenerate) ->
+        val sources: List<Pair<Package, String>> = functionsToGenerateByPackage.entries.mapIndexed { counter, (`package`, functionsToGenerate) ->
             val source: String = functionsToGenerate.joinToString(prefix = "package $`package`\n\n", separator = "\n")
-            val file = File(generatedDir, implicitAnnotationClass.simpleName + "Extensions$counter.kt")
-            file.writeText(source)
+            `package` to source
+        }
+        val grouped = sources.groupBy({ (pack, _) -> pack })
+        grouped.forEach { entry ->
+            val pack = entry.key
+            val file = File(generatedDir, implicitAnnotationClass.simpleName + ".$pack.kt")
+            file.printWriter().use { w ->
+                entry.value.forEach { (_, source) ->
+                    w.println(source)
+                }
+            }
         }
     }
 
