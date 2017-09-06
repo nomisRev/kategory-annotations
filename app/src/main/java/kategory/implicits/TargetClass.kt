@@ -11,6 +11,7 @@ class TargetClass {
     fun y(f: Foo, @implicit b: Bar): Double = f + b
     fun z(@implicit b: Bar, f: Foo): Double = f + b
     fun l(@implicit l: List<Int>): List<Int> = l
+    fun z(@implicit z: List<String>): List<String> = z
 
     //inline fun <reified A> la(@implicit l: List<A>): List<A> = l
 
