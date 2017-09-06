@@ -37,10 +37,9 @@ class OptikalProcessor : AbstractProcessor() {
                 }
 
         if (roundEnv.processingOver()) {
-            val generatedDir = File(this.generatedDir!!, lensesAnnotationClass.simpleName).also { it.mkdirs() }
+            val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
             LensesFileGenerator(annotatedLenses, generatedDir).generate()
         }
-
     }
 
     fun evalAnnotatedElement(element: Element): AnnotatedLens = when {

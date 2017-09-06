@@ -9,15 +9,19 @@ class LensesFileGenerator(
         private val generatedDir: File
 ) {
 
-    fun generate() = buildLenses(annotatedList).writeTo(generatedDir)
+    fun generate() = buildLenses(annotatedList).forEach {
+        it.writeTo(generatedDir)
+    }
 
-    private fun buildLenses(elements: Collection<AnnotatedLens.Element>) = elements.flatMap(this::processElement)
-            .fold(KotlinFile.builder("kategory", "Lenses").skipJavaLangImports(true), { builder, lensSpec ->
-                builder.addFun(lensSpec)
-            }).build()
+    private fun buildLenses(elements: Collection<AnnotatedLens.Element>): List<KotlinFile> = elements.map(this::processElement)
+            .map { (name, funs) ->
+                funs.fold(KotlinFile.builder("kategory.optics", "optics.kategory.lens.$name").skipJavaLangImports(true), { builder, lensSpec ->
+                    builder.addFun(lensSpec)
+                }).build()
+            }
 
-    private fun processElement(annotatedLens: AnnotatedLens.Element): List<FunSpec> =
-            annotatedLens.properties.map { variable ->
+    private fun processElement(annotatedLens: AnnotatedLens.Element): Pair<String, List<FunSpec>> =
+            annotatedLens.type.simpleName.toString().toLowerCase() to annotatedLens.properties.map { variable ->
                 val className = annotatedLens.type.simpleName.toString().toLowerCase()
                 val variableName = variable.simpleName
 
