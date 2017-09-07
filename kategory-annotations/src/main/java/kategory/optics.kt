@@ -1,4 +1,4 @@
-package kategory
+package kategory.optics
 
 import kotlin.annotation.AnnotationRetention.SOURCE
 import kotlin.annotation.AnnotationTarget.CLASS

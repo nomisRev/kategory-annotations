@@ -1,7 +1,6 @@
 package kategory.optics.sample
 
 import kategory.Lens
-import kategory.lenses
 import kategory.optics.*
 
 @lenses data class Street(val number: Int, val name: String)
